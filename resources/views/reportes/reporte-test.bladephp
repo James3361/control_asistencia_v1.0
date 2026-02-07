@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { background: #ff0000 !important; }
+h1 { color: white !important; font-size: 50px !important; }
+</style>
+</head>
+<body>
+<h1>¡PRUEBA DIRECTA - FUNCIONA!</h1>
+<p>Si ves ROJO = Laravel OK</p>
+</body>
+</html>
