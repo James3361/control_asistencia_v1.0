@@ -59,3 +59,4 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 # Control_Asistencia_v10
 # control-asistencia-james
+# control_asistencia_v1.0
