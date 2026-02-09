@@ -1,9 +1,0 @@
-[build]
-  builder = "nixpacks"
-  buildCommand = "composer install --ignore-platform-reqs --no-dev --optimize-autoloader && php artisan optimize && php artisan config:cache && php artisan route:cache"
-
-[deploy]
-  startCommand = "vendor/bin/heroku-php-apache2 public/ -C apache2.conf -p 8080"
-
-[services]
-  internalPort = 8080
