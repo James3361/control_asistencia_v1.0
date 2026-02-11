@@ -6,11 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+
     public function up()
 {
     Schema::table('matriculas', function (Blueprint $table) {
-        $table->string('area_formacion')->nullable()->after('estudiante_id');
-        // Ejemplos: "Informática", "Matemáticas", "Idiomas", "Ciencias"
+        $table->string('area_formacion')->nullable();
     });
 }
 

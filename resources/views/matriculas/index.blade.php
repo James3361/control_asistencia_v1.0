@@ -1,99 +1,89 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Gestión de Matrículas')
-
-@section('styles')
-<style>
-    /* Copiar CSS base de estudiantes/index */
-    .hero, .tabla-container, .tabla-responsive, .btn { /* igual que estudiantes */ }
-    
-    /* Específico para matrículas */
-    .matricula-badge {
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-weight: 700;
-        font-size: 14px;
-        display: inline-block;
-    }
-    .area-informatica { background: linear-gradient(135deg, #3498db, #2980b9); color: white; }
-    .area-matematicas { background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; }
-    .area-idiomas { background: linear-gradient(135deg, #27ae60, #229954); color: white; }
-    .area-general { background: linear-gradient(135deg, #95a5a6, #7f8c8d); color: white; }
-    
-    .seccion-badge {
-        background: rgba(52,152,219,0.1);
-        color: #3498db;
-        padding: 6px 12px;
-        border-radius: 15px;
-        font-size: 13px;
-        font-weight: 600;
-    }
-</style>
-@endsection
+@section('title', 'Matrículas')
 
 @section('content')
-<div class="hero">
-    <h1>🎓 Matrículas Activas</h1>
-    <div class="hero-count">Total: <strong>{{ $matriculas->count() }}</strong></div>
-</div>
+<div class="space-y-6">
+    {{-- HEADER --}}
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-100 flex items-center">
+                <i class="fa-solid fa-user-graduate text-4xl text-purple-400 mr-3"></i>
+                Matrículas
+            </h1>
+            <p class="text-slate-400 mt-1">Control de matrículas por año escolar</p>
+        </div>
+        <a href="{{ route('matriculas.create') }}" class="bg-gradient-to-r from-purple-500 to-emerald-500 hover:from-purple-600 hover:to-emerald-600 text-white px-6 py-2 rounded-xl font-semibold flex items-center shadow-lg">
+            <i class="fa-solid fa-plus mr-2"></i>Nueva Matrícula
+        </a>
+    </div>
 
-<div class="acciones-superiores">
-    <a href="{{ route('matriculas.create') }}" class="btn btn-success">➕ Nueva Matrícula</a>
-    <a href="{{ route('estudiantes.index') }}" class="btn btn-primary">👥 Estudiantes</a>
-</div>
+    {{-- STATS --}}
+    @php $totalMatriculas = $matriculas->count() ?? 0; @endphp
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-gradient-to-br from-purple-500/10 to-slate-800/50 border border-purple-500/30 rounded-2xl p-6">
+            <p class="text-sm text-purple-200 mb-2">Total Matrículas</p>
+            <p class="text-3xl font-bold text-white">{{ $totalMatriculas }}</p>
+        </div>
+        <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-6">
+            <p class="text-sm text-slate-400 mb-2">Aprobados</p>
+            <p class="text-2xl font-bold text-emerald-400">{{ $matriculas->where('estado', 'aprobado')->count() }}</p>
+        </div>
+        <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-6">
+            <p class="text-sm text-slate-400 mb-2">Reprobados</p>
+            <p class="text-2xl font-bold text-red-400">{{ $matriculas->where('estado', 'reprobado')->count() }}</p>
+        </div>
+    </div>
 
-<div class="tabla-container">
-    @if($matriculas->count() > 0)
-        <div class="tabla-responsive">
-            <table>
-                <thead>
+    {{-- TABLA --}}
+    <div class="bg-slate-800/30 border border-slate-700 rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-slate-700/50">
                     <tr>
-                        <th>Estudiante</th>
-                        <th>Área Formación</th>
-                        <th>Sección</th>
-                        <th>Año Escolar</th>
-                        <th>Asistencias</th>
-                        <th>Acciones</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-200">Estudiante</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-200">Año Escolar</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-200">Estado</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-slate-200">Acciones</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @foreach($matriculas as $matricula)
-                    <tr>
-                        <td>
-                            <strong>{{ $matricula->estudiante->nombres }} {{ $matricula->estudiante->apellidos }}</strong>
+                <tbody class="divide-y divide-slate-700">
+                    @forelse($matriculas as $matricula)
+                    <tr class="hover:bg-slate-700/30 transition-all">
+                        <td class="px-6 py-4 font-semibold text-slate-100">
+                            {{ $matricula->estudiante->nombre ?? 'N/A' }} {{ $matricula->estudiante->apellido ?? '' }}
                         </td>
-                        <td>
-                            <span class="matricula-badge area-{{ strtolower(str_replace(' ', '-', $matricula->area_formacion)) }}">
-                                {{ $matricula->area_formacion }}
-                            </span>
+                        <td class="px-6 py-4 text-sm text-slate-300">{{ $matricula->anio->nombre ?? 'Sin año' }}</td>
+                        <td class="px-6 py-4">
+                            @if($matricula->estado == 'aprobado')
+                                <span class="px-4 py-1 bg-emerald-500/20 text-emerald-400 text-sm font-semibold rounded-full border border-emerald-500/30">✓ Aprobado</span>
+                            @else
+                                <span class="px-4 py-1 bg-red-500/20 text-red-400 text-sm font-semibold rounded-full border border-red-500/30">✗ Reprobado</span>
+                            @endif
                         </td>
-                        <td><span class="seccion-badge">{{ $matricula->seccion ?? 'N/A' }}</span></td>
-                        <td style="font-weight: 600; color: #2c3e50;">
-                            {{ $matricula->anio_escolar ?? 'Actual' }}
-                        </td>
-                        <td style="text-align: center;">
-                            {{ $matricula->asistencias()->count() }}
-                        </td>
-                        <td class="acciones">
-                            <a href="{{ route('matriculas.edit', $matricula) }}" class="btn-accion btn-editar">✏️</a>
-                            <form method="POST" action="{{ route('matriculas.destroy', $matricula) }}" style="display: inline;" onsubmit="return confirm('¿Eliminar matrícula?')">
+                        <td class="px-6 py-4 text-right space-x-2">
+                            <a href="{{ route('matriculas.edit', $matricula) }}" class="text-purple-400 hover:text-purple-300 p-2 hover:bg-purple-500/10 rounded-lg">
+                                <i class="fa-solid fa-edit"></i>
+                            </a>
+                            <form method="POST" action="{{ route('matriculas.destroy', $matricula) }}" class="inline">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="btn-accion btn-eliminar">🗑️</button>
+                                <button class="text-red-400 hover:text-red-300 p-2 hover:bg-red-500/10 rounded-lg" onclick="return confirm('¿Eliminar?')">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
                             </form>
                         </td>
                     </tr>
-                    @endforeach
+                    @empty
+                    <tr>
+                        <td colspan="4" class="px-6 py-12 text-center text-slate-400">
+                            <i class="fa-solid fa-user-graduate text-5xl mb-4 opacity-50"></i>
+                            No hay matrículas registradas
+                        </td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
-        <div style="margin-top: 50px; text-align: center;">
-            {{ $matriculas->links() }}
-        </div>
-    @else
-        <div class="vacio">
-            <h3>📭 Sin matrículas</h3>
-            <a href="{{ route('matriculas.create') }}" class="btn btn-success">➕ Primera Matrícula</a>
-        </div>
-    @endif
+    </div>
 </div>
 @endsection

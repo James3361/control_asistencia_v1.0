@@ -34,4 +34,30 @@ public function create()
     Matricula::create($request->all());
     return redirect()->route('matriculas.index')->with('success', '✅ Matrícula creada');
 }
+
+
+public function edit(Matricula $matricula)
+    {
+        $estudiantes = Estudiante::all();
+        $anios = AnioEscolar::all();
+        
+        return view('matriculas.edit', compact('matricula', 'estudiantes', 'anios'));
+    }
+
+
+public function update(Request $request, Matricula $matricula)
+    {
+        $request->validate([
+            'estudiante_id' => 'required|exists:estudiantes,id',
+            'anio_escolar_id' => 'required|exists:anios_escolares,id',
+        ]);
+
+        $matricula->update($request->all());
+
+        return redirect()->route('matriculas.index')
+                        ->with('success', '✅ Matrícula actualizada correctamente');
+    }
+    
 }
+
+

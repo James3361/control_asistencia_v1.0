@@ -1,270 +1,354 @@
 @extends('layouts.app')
 
-@section('title', 'Reporte Completo de Asistencias')
-
-@section('styles')
-<style>
-    /* FILTRO PRINCIPAL */
-    .hero {
-        text-align: center;
-        margin-bottom: 60px;
-        padding: 60px 40px;
-        background: rgba(255,255,255,0.1);
-        backdrop-filter: blur(25px);
-        border-radius: 30px;
-        border: 2px solid rgba(255,255,255,0.2);
-    }
-    .hero h1 {
-        font-size: 44px;
-        background: linear-gradient(45deg, #fff, rgba(255,255,255,0.9));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 15px;
-        font-weight: 900;
-    }
-
-    /* FILTRO ESPECTACULAR */
-    .filtro-container {
-        background: rgba(255,255,255,0.97);
-        backdrop-filter: blur(25px);
-        border-radius: 30px;
-        padding: 50px;
-        margin-bottom: 50px;
-        box-shadow: 0 30px 80px rgba(0,0,0,0.25);
-        border: 3px solid rgba(255,255,255,0.4);
-    }
-    .filtro-titulo {
-        color: #2c3e50;
-        text-align: center;
-        font-size: 32px;
-        margin-bottom: 40px;
-        font-weight: 800;
-    }
-    .filtro-form {
-        display: flex;
-        gap: 35px;
-        align-items: end;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    .filtro-grupo {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        min-width: 250px;
-    }
-    .filtro-label {
-        font-weight: 800;
-        color: #34495e;
-        font-size: 18px;
-    }
-    .filtro-input {
-        padding: 22px 30px;
-        border: 4px solid #3498db;
-        border-radius: 25px;
-        font-size: 18px;
-        background: white;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 10px 30px rgba(52,152,219,0.15);
-    }
-    .filtro-input:focus {
-        outline: none;
-        border-color: #2980b9;
-        transform: translateY(-5px) scale(1.02);
-        box-shadow: 0 25px 50px rgba(52,152,219,0.35);
-    }
-
-    /* BOTONES */
-    .btn {
-        padding: 22px 50px;
-        border: none;
-        border-radius: 35px;
-        font-size: 18px;
-        font-weight: 800;
-        cursor: pointer;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 12px;
-        white-space: nowrap;
-    }
-    .btn-filtrar {
-        background: linear-gradient(45deg, #e74c3c, #c0392b);
-        color: white;
-        box-shadow: 0 15px 40px rgba(231,76,60,0.4);
-    }
-    .btn-filtrar:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 25px 60px rgba(231,76,60,0.6);
-    }
-    .btn-limpiar {
-        background: linear-gradient(45deg, #95a5a6, #7f8c8d);
-        color: white;
-        box-shadow: 0 15px 40px rgba(149,165,166,0.4);
-    }
-    .btn-volver {
-        background: linear-gradient(45deg, #3498db, #2980b9);
-        color: white;
-        display: inline-flex;
-        margin-bottom: 30px;
-        box-shadow: 0 15px 40px rgba(52,152,219,0.4);
-        align-items: center;
-        gap: 12px;
-    }
-
-    /* TABLA PROFESIONAL */
-    .tabla-container {
-        background: rgba(255,255,255,0.97);
-        backdrop-filter: blur(25px);
-        border-radius: 30px;
-        padding: 50px;
-        box-shadow: 0 30px 80px rgba(0,0,0,0.25);
-        border: 3px solid rgba(255,255,255,0.4);
-        overflow: hidden;
-    }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 35px;
-        background: white;
-        border-radius: 25px;
-        overflow: hidden;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-    }
-    th {
-        background: linear-gradient(135deg, #27ae60, #2ecc71);
-        color: white;
-        padding: 28px 30px;
-        text-align: left;
-        font-weight: 800;
-        font-size: 18px;
-        letter-spacing: 0.5px;
-    }
-    td {
-        padding: 25px 30px;
-        border-bottom: 1px solid #ecf0f1;
-        transition: all 0.3s;
-    }
-    tr:hover td {
-        background: #f8f9fa;
-    }
-    .verde {
-        background: linear-gradient(135deg, #d5f4e6, #c3e6cb) !important;
-        border-left: 8px solid #27ae60 !important;
-    }
-    .verde td { border-color: #a8e6cf; }
-    .amarillo {
-        background: linear-gradient(135deg, #fff2cc, #ffe699) !important;
-        border-left: 8px solid #f39c12 !important;
-    }
-    .amarillo td { border-color: #f2d492; }
-    .rojo {
-        background: linear-gradient(135deg, #fadbd8, #f5b7b1) !important;
-        border-left: 8px solid #e74c3c !important;
-    }
-    .rojo td { border-color: #f2a69e; }
-
-    /* ESTADO VACÍO */
-    .vacio {
-        text-align: center;
-        padding: 100px 60px;
-        color: #7f8c8d;
-    }
-    .vacio h3 {
-        font-size: 34px;
-        margin-bottom: 25px;
-        color: #34495e;
-    }
-
-    /* RESPONSIVE */
-    @media (max-width: 1024px) {
-        .filtro-form { flex-direction: column; align-items: stretch; }
-        .filtro-input { width: 100%; }
-    }
-    @media (max-width: 768px) {
-        table, .tabla-container { font-size: 14px; }
-        th, td { padding: 18px 15px; }
-        .btn { width: 100%; margin-bottom: 15px; }
-    }
-</style>
-@endsection
-
 @section('content')
-<!-- HERO -->
-<div class="hero">
-    <h1>📊 Reporte Completo</h1>
-    <p style="font-size: 20px; color: rgba(255,255,255,0.9);">Estadísticas detalladas de asistencia - {{ now()->format('d F Y') }}</p>
-</div>
+<div class="container-fluid py-4">
+    {{-- HEADER MEJORADO --}}
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center bg-gradient-primary text-white p-5 rounded-4 shadow-xl animate__animated animate__fadeInDown">
+                <div>
+                    <h1 class="h1 mb-2 fw-bold">
+                        <i class="fas fa-chart-line me-3"></i>Reporte de Asistencia
+                    </h1>
+                    <div class="row g-2 mb-0">
+                        <div class="col-auto">
+                            <span class="badge bg-light text-dark px-3 py-2 fs-6">
+                                {{ count($estudiantes ?? []) }} estudiantes
+                            </span>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge bg-success px-3 py-2 fs-6">
+                                {{ number_format($estudiantes->avg('porcentaje') ?? 0, 1) }}% promedio
+                            </span>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge bg-info px-3 py-2 fs-6">
+                                {{ $stats['total_matriculas'] ?? 0 }} matrículas
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ route('asistencias.index') }}" class="btn btn-light btn-lg shadow-lg px-4">
+                    <i class="fas fa-arrow-left me-2"></i>Volver al Panel
+                </a>
+            </div>
+        </div>
+    </div>
 
-<!-- FILTRO AVANZADO -->
-<div class="filtro-container">
-    <h2 class="filtro-titulo">🔍 Filtros de Fecha</h2>
-    <form method="GET" action="{{ route('reporte.estudiantes') }}" class="filtro-form">
-        <div class="filtro-grupo">
-            <label class="filtro-label">📅 Fecha Desde</label>
-            <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}" class="filtro-input" max="{{ now()->format('Y-m-d') }}">
+    {{-- STATS CARDS MEJORADAS --}}
+    @if(isset($stats))
+    <div class="row g-4 mb-5 animate__animated animate__fadeInUp">
+        <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="card border-0 shadow-lg h-100 card-hover-effect">
+                <div class="card-body text-center p-4">
+                    <div class="stat-icon mb-3">
+                        <i class="fas fa-users fa-3x text-primary"></i>
+                    </div>
+                    <h2 class="h3 fw-bold text-primary mb-1 counter" data-target="{{ $stats['total_estudiantes'] }}">0</h2>
+                    <p class="text-muted mb-2">Estudiantes Total</p>
+                    <div class="progress progress-sm mb-0">
+                        <div class="progress-bar bg-primary" style="width: 85%"></div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="filtro-grupo">
-            <label class="filtro-label">📅 Fecha Hasta</label>
-            <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}" class="filtro-input" max="{{ now()->format('Y-m-d') }}">
-        </div>
-        <button type="submit" class="btn btn-filtrar">🔍 FILTRAR RESULTADOS</button>
-        <a href="{{ route('reporte.estudiantes') }}" class="btn btn-limpiar">🗑️ LIMPIAR TODO</a>
-    </form>
-</div>
 
-<!-- TABLA RESULTADOS -->
-<div class="tabla-container">
-    <a href="{{ route('asistencias.index') }}" class="btn btn-volver" style="margin-bottom: 30px;">
-        ← Volver al Listado de Asistencias
-    </a>
-    
-    @if(count($estudiantes) > 0)
-        <table>
-            <thead>
-                <tr>
-                    <th>Estudiante Completo</th>
-                    <th>Total Clases</th>
-                    <th>Presentes</th>
-                    <th style="text-align: center;">% Asistencia</th>
-                    <th style="text-align: center;">Ausentes</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($estudiantes as $estudiante)
-                <tr class="{{ $estudiante->porcentaje >= 90 ? 'verde' : ($estudiante->porcentaje >= 70 ? 'amarillo' : 'rojo') }}">
-                    <td>
-                        <strong style="font-size: 18px;">{{ $estudiante->nombres }} {{ $estudiante->apellidos }}</strong>
-                    </td>
-                    <td style="font-size: 18px; font-weight: 600;">{{ $estudiante->total_clases }}</td>
-                    <td style="font-size: 18px; font-weight: 600;">{{ $estudiante->presentes }}</td>
-                    <td style="text-align: center;">
-                        <strong style="font-size: 24px; font-weight: 900;">
-                            {{ $estudiante->porcentaje }}%
-                        </strong>
-                    </td>
-                    <td style="text-align: center; color: #e74c3c; font-weight: 800; font-size: 20px;">
-                        {{ $estudiante->total_clases - $estudiante->presentes }}
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-        
-        <div style="text-align: center; margin-top: 40px; padding: 30px; background: rgba(255,255,255,0.5); border-radius: 20px;">
-            <p style="font-size: 18px; color: #2c3e50; font-weight: 600;">
-                📈 Total estudiantes mostrados: <strong>{{ count($estudiantes) }}</strong>
-            </p>
+        <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="card border-0 shadow-lg h-100 card-hover-effect">
+                <div class="card-body text-center p-4">
+                    <div class="stat-icon mb-3">
+                        <i class="fas fa-user-graduate fa-3x text-success"></i>
+                    </div>
+                    <h2 class="h3 fw-bold text-success mb-1 counter" data-target="{{ $stats['total_matriculas'] }}">0</h2>
+                    <p class="text-muted mb-2">Matrículas Activas</p>
+                    <div class="progress progress-sm mb-0">
+                        <div class="progress-bar bg-success" style="width: 92%"></div>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="card border-0 shadow-lg h-100 card-hover-effect">
+                <div class="card-body text-center p-4">
+                    <div class="stat-icon mb-3">
+                        <i class="fas fa-calendar fa-3x text-info"></i>
+                    </div>
+                    <h2 class="h3 fw-bold text-info mb-1 counter" data-target="{{ $stats['total_anios'] }}">0</h2>
+                    <p class="text-muted mb-2">Años Escolares</p>
+                    <div class="progress progress-sm mb-0">
+                        <div class="progress-bar bg-info" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="card border-0 shadow-xl h-100 card-hover-effect">
+                <div class="card-body text-center p-4">
+                    <div class="stat-icon mb-3">
+                        <i class="fas fa-chart-pie fa-3x text-warning"></i>
+                    </div>
+                    <h2 class="h3 fw-bold text-warning mb-1">
+                        {{ number_format($estudiantes->avg('porcentaje') ?? 0, 1) }}<span class="h6 fw-normal">%</span>
+                    </h2>
+                    <p class="text-muted mb-2">Asistencia Promedio</p>
+                    <div class="progress mb-0" style="height: 10px;">
+                        <div class="progress-bar bg-warning" style="width: {{ ($estudiantes->avg('porcentaje') ?? 0) }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- TABLA PRINCIPAL MEJORADA --}}
+    @if(isset($estudiantes) && count($estudiantes) > 0)
+    <div class="row animate__animated animate__fadeInUp">
+        <div class="col-12">
+            <div class="card border-0 shadow-xl">
+                <div class="card-header bg-gradient-secondary text-white py-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div>
+                            <h4 class="mb-2 fw-bold">
+                                <i class="fas fa-table me-2"></i>Detalle Completo por Estudiante
+                            </h4>
+                            <small class="opacity-90">{{ count($estudiantes) }} estudiantes • Ordenado por rendimiento</small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <span class="badge bg-light text-dark px-3 py-2">
+                                <i class="fas fa-filter me-1"></i>Activos
+                            </span>
+                            <span class="badge bg-success px-3 py-2">
+                                <i class="fas fa-chart-line me-1"></i>{{ $estudiantes->where('porcentaje', '>=', 70)->count() }} aprobados
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 table-modern">
+                            <thead class="table-dark-gradient">
+                                <tr>
+                                    <th width="35%">Estudiante</th>
+                                    <th width="10%">Total</th>
+                                    <th width="12%"><i class="fas fa-check text-success"></i> Presentes</th>
+                                    <th width="12%"><i class="fas fa-times text-danger"></i> Ausentes</th>
+                                    <th width="12%">Porcentaje</th>
+                                    <th width="19%">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($estudiantes->sortByDesc('porcentaje') as $index => $estudiante)
+                                <tr class="table-row-hover {{ $index < 3 ? 'table-top-3' : '' }}">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-md {{ $estudiante->porcentaje >= 70 ? 'bg-gradient-success' : 'bg-gradient-warning' }} me-3">
+                                                {{ substr($estudiante->nombres, 0, 1) }}
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark fs-6">{{ $estudiante->nombres }} {{ $estudiante->apellidos }}</div>
+                                                <small class="text-muted">#{{ $index + 1 }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark px-3 py-2 fs-6">{{ $estudiante->total_clases }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success px-4 py-2 fs-6">
+                                            <i class="fas fa-check me-1"></i>{{ $estudiante->presentes }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-danger px-4 py-2 fs-6">
+                                            <i class="fas fa-times me-1"></i>{{ $estudiante->ausentes ?? ($estudiante->total_clases - $estudiante->presentes) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="progress progress-sm mb-0 mx-auto" style="width: 120px;">
+                                            <div class="progress-bar {{ $estudiante->porcentaje >= 70 ? 'bg-success' : 'bg-warning' }}" 
+                                                 style="width: {{ $estudiante->porcentaje }}%;">
+                                                <small class="justify-content-center d-flex w-100">{{ $estudiante->porcentaje }}%</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if($estudiante->porcentaje >= 80)
+                                            <span class="badge bg-success px-4 py-2 fs-6 shadow-sm">
+                                                <i class="fas fa-crown text-warning me-1"></i>Excelente
+                                            </span>
+                                        @elseif($estudiante->porcentaje >= 70)
+                                            <span class="badge bg-success px-4 py-2 fs-6">
+                                                <i class="fas fa-check-circle me-1"></i>Aprobado
+                                            </span>
+                                        @elseif($estudiante->porcentaje >= 60)
+                                            <span class="badge bg-warning px-4 py-2 fs-6 text-dark">
+                                                <i class="fas fa-exclamation-triangle me-1"></i>Mejorar
+                                            </span>
+                                        @else
+                                            <span class="badge bg-danger px-4 py-2 fs-6">
+                                                <i class="fas fa-exclamation-circle me-1"></i>Crítico
+                                            </span>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     @else
-        <div class="vacio">
-            <h3>📋 No se encontraron asistencias</h3>
-            <p>Ajusta las fechas del filtro o <a href="{{ route('asistencias.create') }}" style="color: #3498db; font-weight: 600;">registra nuevas asistencias</a></p>
-            <a href="{{ route('asistencias.create') }}" class="btn btn-success" style="margin-top: 30px; display: inline-block;">
-                ➕ Registrar Primera Asistencia
-            </a>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="text-center py-5">
+                <i class="fas fa-chart-line fa-4x text-muted mb-4 opacity-75"></i>
+                <h3 class="text-muted mb-3">Sin datos para mostrar</h3>
+                <p class="text-muted mb-4">Registra las primeras asistencias para generar reportes detallados</p>
+                <a href="{{ route('asistencias.create') }}" class="btn btn-primary btn-lg px-5">
+                    <i class="fas fa-plus me-2"></i>Nueva Asistencia
+                </a>
+            </div>
         </div>
+    </div>
     @endif
 </div>
+
+<style>
+/* ANIMACIONES SUAVES */
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate__animated {
+    animation-duration: 0.8s;
+    animation-fill-mode: both;
+}
+.animate__fadeInDown { animation-name: fadeInDown; }
+.animate__fadeInUp { animation-name: fadeInUp; }
+
+/* EFECTOS HOVER */
+.card-hover-effect {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+.card-hover-effect:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12) !important;
+}
+
+.stat-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1));
+    border: 3px solid rgba(102,126,234,0.2);
+}
+
+/* GRADIENTES MEJORADOS */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
+}
+.bg-gradient-secondary {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+}
+
+.table-dark-gradient {
+    background: linear-gradient(135deg, #2c3e50, #34495e) !important;
+}
+
+.table-modern thead th {
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+.table-row-hover:hover {
+    background: linear-gradient(90deg, rgba(102,126,234,0.08), rgba(118,75,162,0.08)) !important;
+    transform: scale(1.01);
+}
+
+.table-top-3:nth-child(1) { border-left: 5px solid #28a745; }
+.table-top-3:nth-child(2) { border-left: 5px solid #ffc107; }
+.table-top-3:nth-child(3) { border-left: 5px solid #17a2b8; }
+
+.avatar-md {
+    width: 45px;
+    height: 45px;
+    border-radius: 50% 50% 50% 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.bg-gradient-success {
+    background: linear-gradient(135deg, #56ab2f, #a8e6cf);
+}
+.bg-gradient-warning {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+}
+
+.progress-sm {
+    height: 6px;
+}
+.progress {
+    border-radius: 10px;
+    overflow: visible;
+}
+
+.shadow-xl {
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15) !important;
+}
+
+.counter {
+    font-size: 2.5rem !important;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .stat-icon { width: 60px; height: 60px; }
+    .avatar-md { width: 35px; height: 35px; font-size: 14px; }
+}
+</style>
+
+<script>
+// CONTADORES ANIMADOS
+document.addEventListener('DOMContentLoaded', function() {
+    const counters = document.querySelectorAll('.counter');
+    counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        const increment = target / 100;
+        let current = 0;
+        
+        const updateCounter = () => {
+            if (current < target) {
+                current += increment;
+                counter.textContent = Math.floor(current);
+                requestAnimationFrame(updateCounter);
+            } else {
+                counter.textContent = target;
+            }
+        };
+        updateCounter();
+    });
+});
+</script>
 @endsection

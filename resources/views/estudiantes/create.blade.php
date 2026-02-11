@@ -12,6 +12,16 @@
 </div>
 
 <div class="form-container">
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+    
     <form method="POST" action="{{ route('estudiantes.store') }}">
         @csrf
         
@@ -30,9 +40,9 @@
         
         <div class="form-row">
             <div class="form-group">
-                <label class="form-label">🆔 Cédula</label>
-                <input type="text" name="cedula" value="{{ old('cedula') }}" class="form-input @error('cedula') input-error @enderror" required>
-                @error('cedula') <div class="error-message">{{ $message }}</div> @enderror
+                <label class="form-label">🆔 Documento</label>
+                <input type="text" name="documento" value="{{ old('documento') }}" class="form-input @error('documento') input-error @enderror" required>
+                @error('documento') <div class="error-message">{{ $message }}</div> @enderror
             </div>
             <div class="form-group">
                 <label class="form-label">📱 Teléfono</label>
@@ -40,6 +50,21 @@
                 @error('telefono') <div class="error-message">{{ $message }}</div> @enderror
             </div>
         </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">📧 Correo</label>
+                <input type="email" name="correo" value="{{ old('correo') }}" class="form-input @error('correo') input-error @enderror">
+                @error('correo') <div class="error-message">{{ $message }}</div> @enderror
+            </div>
+            <div class="form-group">
+                <label class="form-label">📅 Fecha Nacimiento</label>
+                <input type="date" name="fecha_nacimiento" value="{{ old('fecha_nacimiento') }}" class="form-input">
+            </div>
+        </div>
+        
+        <!-- Hidden institución -->
+        <input type="hidden" name="institucion_id" value="{{ $institucion->id ?? 1 }}">
         
         <div class="form-botones">
             <button type="submit" class="btn btn-primary">💾 Guardar Estudiante</button>

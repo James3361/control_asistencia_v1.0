@@ -204,7 +204,9 @@
 @section('content')
 <!-- HERO -->
 <div class="hero">
-    <h1>📋 Asistencias Registradas</h1>
+<h1 class="text-3xl font-bold text-gray-800 bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent mb-6">
+  Asistencias
+</h1>
     <div class="hero-count">
         Total: <strong>{{ $asistencias->count() }}</strong> registros encontrados
         @if($asistencias->hasPages())

@@ -9,10 +9,34 @@ use Illuminate\Http\Request;
 class AnioEscolarController extends Controller
 {
     public function index()
+{
+    $totalAnios = AnioEscolar::count();
+    
+    $anios = AnioEscolar::orderBy('id', 'desc')
+                ->paginate(12);
+
+ 
+                
+   return view('anios.index', compact('anios', 'totalAnios'));
+
+    
+}
+
+  public function update(Request $request, AnioEscolar $anio)
     {
-        $anios = AnioEscolar::all();
-        return view('anios.index', compact('anios'));
+        $request->validate([
+            'nombre' => 'required|string|max:20|unique:anio_escolares,nombre,' . $anio->id,
+            'fecha_inicio' => 'required|date',
+            'fecha_fin' => 'required|date|after:fecha_inicio',
+            'estado' => 'required|in:activo,inactivo'
+        ]);
+
+        $anio->update($request->all());
+
+        return redirect()->route('anios.index')
+                        ->with('success', '✅ Año escolar actualizado correctamente');
     }
+
 
     public function create()
     {
@@ -33,6 +57,18 @@ class AnioEscolarController extends Controller
         AnioEscolar::create($request->all());
 
         return redirect()->route('anios.index')->with('success', 'Año escolar creado correctamente');
+    }
+
+     public function edit(AnioEscolar $anio)
+    {
+        return view('anios.edit', compact('anio'));
+    }
+
+     public function destroy(AnioEscolar $anio)
+    {
+        $anio->delete();
+        return redirect()->route('anios.index')
+                        ->with('success', '✅ Año escolar eliminado correctamente');
     }
 }
 

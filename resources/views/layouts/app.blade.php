@@ -1,150 +1,53 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Control de Asistencias Escolares')</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'Control Asistencia')</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); 
-            min-height: 100vh;
-            color: #333;
-        }
-        
-        /* HEADER NAVEGACIÓN */
-        .header {
-            background: rgba(255,255,255,0.97);
-            backdrop-filter: blur(25px);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 80px;
-        }
-        
-        .logo {
-            font-size: 28px;
-            font-weight: 800;
-            background: linear-gradient(45deg, #3498db, #667eea);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-decoration: none;
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .nav-link {
-            color: #2c3e50;
-            text-decoration: none;
-            font-weight: 600;
-            padding: 12px 24px;
-            border-radius: 25px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .nav-link:hover {
-            background: rgba(52,152,219,0.1);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(52,152,219,0.2);
-        }
-        
-        .nav-active {
-            background: linear-gradient(45deg, #3498db, #2980b9);
-            color: white !important;
-            box-shadow: 0 8px 25px rgba(52,152,219,0.3);
-        }
-        
-        /* CONTENIDO PRINCIPAL */
-        .content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 50px 30px;
-            min-height: calc(100vh - 160px);
-        }
-        
-        /* ALERTAS */
-        .alert-success {
-            background: linear-gradient(135deg, #d4edda, #c3e6cb);
-            color: #155724;
-            padding: 25px 30px;
-            border-radius: 20px;
-            margin-bottom: 40px;
-            border-left: 6px solid #28a745;
-            box-shadow: 0 10px 30px rgba(40,167,69,0.2);
-            animation: slideIn 0.5s ease;
-        }
-        
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            .nav-container { flex-direction: column; gap: 20px; padding: 20px; height: auto; }
-            .content { padding: 30px 20px; }
-        }
+        * { font-family: 'Inter', sans-serif; }
+        .btn-modern { transition: all 0.3s ease; }
+        .btn-modern:hover { transform: translateY(-2px); }
     </style>
-
-    
-    
-    @yield('styles')
 </head>
-<body>
-    <!-- HEADER -->
-    <header class="header">
-        <div class="nav-container">
-            <a href="{{ route('dashboard') }}" class="logo">📚 Control Escolar</a>
-            <div class="nav-links">
-    <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'nav-active' : '' }}">📊 Dashboard</a>
-    <a href="{{ route('asistencias.index') }}" class="nav-link {{ request()->routeIs('asistencias.*') ? 'nav-active' : '' }}">📋 Asistencias</a>
-    <a href="{{ route('estudiantes.index') }}" class="nav-link {{ request()->routeIs('estudiantes.*') ? 'nav-active' : '' }}">👥 Estudiantes</a>
-    <a href="{{ route('matriculas.index') }}" class="nav-link {{ request()->routeIs('matriculas.*') ? 'nav-active' : '' }}">🎓 Matrículas</a>
-    <a href="{{ route('reporte.estudiantes') }}" class="nav-link {{ request()->routeIs('reporte.estudiantes') ? 'nav-active' : '' }}">📈 Reportes</a>
-    <a href="{{ route('reporte.area') }}" class="nav-link {{ request()->routeIs('reporte.area') ? 'nav-active' : '' }}">📚 Por Área</a>
-    <a href="{{ route('anios.index') }}" class="nav-link {{ request()->routeIs('anios.*') ? 'nav-active' : '' }}">📅 Años</a>
-</div>
-
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- Navbar Pública -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="/" class="text-2xl font-bold text-blue-600 flex items-center">
+                <i class="fas fa-graduation-cap mr-3"></i>Control Asistencia
+            </a>
+            <div class="flex items-center space-x-4">
+                @auth
+                    <a href="{{ route('dashboard') }}" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-semibold hover:bg-blue-700">
+                        <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-xl font-semibold">
+                        Iniciar Sesión
+                    </a>
+                    <a href="{{ route('register') }}" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-xl font-semibold">
+                        Registrarse
+                    </a>
+                @endauth
+            </div>
         </div>
+    </nav>
 
-    </header>
-
-    <!-- CONTENIDO -->
-    <main class="content">
+    <main class="container mx-auto px-6 py-12">
         @if(session('success'))
-            <div class="alert-success">
-                <strong>✅ Éxito!</strong> {{ session('success') }}
+            <div class="bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-xl mb-8 max-w-2xl mx-auto">
+                <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
             </div>
         @endif
-        
-        @if(session('error'))
-            <div class="alert-error" style="background: linear-gradient(135deg, #f8d7da, #f5c6cb); color: #721c24; border-left-color: #dc3545;">
-                <strong>❌ Error:</strong> {{ session('error') }}
-            </div>
-        @endif
-        
+
         @yield('content')
     </main>
-
-    @yield('scripts')
 </body>
 </html>
